@@ -282,7 +282,7 @@
 
     <!-- JavaScript to Handle Form Submission -->
 <script>
-document.getElementById("contactForm").addEventListener("submit", async function (e) {
+document.getElementById("contactForm").addEventListener("submit", async function(e) {
     e.preventDefault(); // Prevent default form submission
 
     const name = document.getElementById("name").value;
@@ -292,7 +292,8 @@ document.getElementById("contactForm").addEventListener("submit", async function
     const responseMessage = document.getElementById("responseMessage");
 
     try {
-        const response = await fetch("https://muraliyar-manpower-service.onrender.com/contact.html", { // Updated URL
+        // ✅ Ensure the API URL is correct (Use Render-deployed backend)
+        const response = await fetch("https://muraliyar-manpower-service.onrender.com/api/contact", { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, email, phone, message })
