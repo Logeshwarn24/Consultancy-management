@@ -1,11 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 const path = require("path");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 dotenv.config();
 const app = express();
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "*" })); // Allow all origins for testing
+app.use(cors({ origin: "*" })); // ✅ Allow all origins for testing
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -28,35 +28,38 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
-// Contact Schema
+// JWT Authentication Middleware
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.header("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "Access Denied. No token provided." });
+    }
+
+    const token = authHeader.split(" ")[1];
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verified; // Attach user info to request
+        next();
+    } catch (err) {
+        return res.status(403).json({ message: "Invalid or expired token." });
+    }
+};
+
+// Contact Schema (Ensure 'phone' is a String)
 const contactSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
     message: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String, required: true }, // ✅ Fixed data type (String instead of Number)
 });
 const Contact = mongoose.model("Contact", contactSchema);
 
-// JWT Authentication Middleware
-const authMiddleware = (req, res, next) => {
-    const token = req.header("Authorization");
-    if (!token) return res.status(401).json({ message: "Access Denied" });
-
-    try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified;
-        next();
-    } catch (err) {
-        res.status(400).json({ message: "Invalid Token" });
-    }
-};
-
-// Nodemailer Setup
+// Nodemailer Setup (Use App Password instead of Gmail password)
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.EMAIL_USER, // ✅ Ensure correct email credentials
+        pass: process.env.EMAIL_PASS, // ✅ Use Gmail App Password, not personal password
     },
 });
 
@@ -98,7 +101,17 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-// Contact Form Submission
+// Protected Route - Get User Data
+app.get("/api/user", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select("-password");
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
+// Contact Form Route (Ensure correct route)
 app.post("/api/contact", async (req, res) => {
     try {
         const { name, email, message, phone } = req.body;
@@ -109,6 +122,7 @@ app.post("/api/contact", async (req, res) => {
         const newContact = new Contact({ name, email, message, phone });
         await newContact.save();
 
+        // Send email notification
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
@@ -123,7 +137,7 @@ app.post("/api/contact", async (req, res) => {
     }
 });
 
-// Serve Frontend Files
+// Serve Frontend Files (Ensure path is correct)
 const frontendPath = path.join(__dirname, "../frontend/");
 app.use(express.static(frontendPath));
 
