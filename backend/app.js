@@ -45,6 +45,16 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
+// Protected Route - Get User Data
+app.get("/api/user", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select("-password");
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
 // Contact Schema (Ensure 'phone' is a String)
 const contactSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -101,15 +111,6 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-// Protected Route - Get User Data
-app.get("/api/user", authMiddleware, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId).select("-password");
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error });
-    }
-});
 
 // Contact Form Route (Ensure correct route)
 app.post("/api/contact", async (req, res) => {
