@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api"; // Change this for deployment
+const API_BASE_URL = "https://muraliyar-manpower-service.onrender.com/api"; // Change this for deployment
 
 // Show Bootstrap Alert Message
 function showAlert(elementId, message, type) {
