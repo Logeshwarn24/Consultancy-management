@@ -1247,3 +1247,20 @@ footer p {
         font-size: 16px;
     }
 }
+.top-banner {
+    display: flex;
+    justify-content: center; /* Centers image horizontally */
+    align-items: center; /* Centers image vertically */
+    width: 100%; /* Full width */
+    max-width: 100%;
+    overflow: hidden; /* Prevents overflow issues */
+    padding: 10px;
+}
+
+.banner-image {
+    max-width: 100%; /* Ensures the image does not exceed the container width */
+    max-height: 300px; /* Adjust this based on your design preference */
+    height: auto; /* Maintains aspect ratio */
+    width: auto; /* Ensures image adjusts properly */
+    object-fit: contain; /* Keeps full image visible */
+}
