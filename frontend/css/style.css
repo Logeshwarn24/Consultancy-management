@@ -1259,7 +1259,7 @@ footer p {
 
 .banner-image {
     max-width: 100%; /* Ensures the image does not exceed the container width */
-    max-height: 300px; /* Adjust this based on your design preference */
+    max-height: 400px; /* Adjust this based on your design preference */
     height: auto; /* Maintains aspect ratio */
     width: auto; /* Ensures image adjusts properly */
     object-fit: contain; /* Keeps full image visible */
